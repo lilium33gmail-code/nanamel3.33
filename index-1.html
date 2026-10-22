@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nanamel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Quicksand:wght@500;700&family=Vazirmatn:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #121011;
+            --bg-card: #1e1a1d;
+            --bg-nav: #171416;
+            --text-main: #f5f0f2;
+            --text-muted: #a89ba3;
+            --accent: #d4a373;
+            --accent-dark: #b08557;
+            --border-color: rgba(212, 163, 115, 0.2);
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
+            --radius: 16px;
+            --safe-padding: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body[dir="rtl"] { font-family: 'Vazirmatn', sans-serif; }
+        body[dir="rtl"] .nav-btn { font-family: 'Vazirmatn', sans-serif; }
+        body[dir="rtl"] .title-placeholder { font-family: 'Vazirmatn', sans-serif; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            padding-bottom: 80px;
+            overflow-x: hidden;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(18, 16, 17, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 32px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        body[dir="rtl"] header h1 {
+            font-family: 'Vazirmatn', sans-serif;
+            font-style: normal;
+        }
+
+        .lang-btn, .admin-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 6px;
+        }
+
+        .lang-btn:hover, .admin-btn:hover {
+            background: var(--accent);
+            color: var(--bg-main);
+        }
+
+        .admin-btn.active {
+            background: var(--accent);
+            color: var(--bg-main);
+        }
+
+        .nav-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 16px var(--safe-padding);
+            gap: 10px;
+            background: var(--bg-nav);
+            border-bottom: 1px solid var(--border-color);
+            scrollbar-width: none;
+        }
+        .nav-container::-webkit-scrollbar { display: none; }
+
+        .nav-btn {
+            padding: 10px 18px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .nav-btn.active {
+            background: var(--accent);
+            color: var(--bg-main);
+            border-color: var(--accent);
+        }
+
+        .nav-btn.locked {
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #666;
+        }
+
+        main {
+            padding: var(--safe-padding);
+            width: 100%;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            text-align: center;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        
+        body[dir="rtl"] .page-title {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .add-area {
+            display: none;
+            background: var(--bg-card);
+            border: 2px dashed var(--accent);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .add-area.show { display: block; }
+
+        .add-area input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .add-btn, .export-btn {
+            background: var(--accent);
+            color: var(--bg-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .export-btn {
+            background: #4caf50;
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 8px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .media-placeholder {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #0a090a;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .media-placeholder img, 
+        .media-placeholder video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .media-placeholder iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .title-placeholder {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            color: var(--text-muted);
+            outline: none;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 50, 50, 0.85);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+
+        .admin-mode .delete-btn { display: block; }
+
+        .lock-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .lock-screen h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent);
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        body[dir="rtl"] .lock-screen h2 {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .lock-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .lock-btn {
+            padding: 12px 24px;
+            background: var(--accent);
+            color: var(--bg-main);
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .lock-error {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 20px;
+            font-size: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .export-box {
+            display: none;
+            background: var(--bg-card);
+            border: 2px solid #4caf50;
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .export-box.show { display: block; }
+
+        .export-status {
+            font-size: 13px;
+            color: #4caf50;
+            margin-top: 8px;
+            display: none;
+        }
+
+        @media (max-width: 320px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="admin-btn" id="adminBtn" onclick="toggleAdmin()">Admin</button>
+        <h1 id="siteLogo">Nanamel</h1>
+        <button class="lang-btn" id="langBtn" onclick="toggleLanguage()">FA</button>
+    </header>
+
+    <div class="nav-container" id="navMenu">
+        <button class="nav-btn active" onclick="showPage('didForHer', this)" data-en="Things I did for her" data-fa="کارهایی که براش کردم">Things I did for her</button>
+        <button class="nav-btn" onclick="showPage('sheDidForMe', this)" data-en="Things she did for me" data-fa="کارهایی که برام کرد">Things she did for me</button>
+        <button class="nav-btn" onclick="showPage('together', this)" data-en="Things we do together" data-fa="کارهایی که با هم کردیم">Things we do together</button>
+        <button class="nav-btn" onclick="showPage('weLove', this)" data-en="Things we love" data-fa="چیزایی که دوسش داریم">Things we love</button>
+        <button class="nav-btn" onclick="showPage('weWill', this)" data-en="Things we will do" data-fa="کارهایی که قراره بکنیم">Things we will do</button>
+        <button class="nav-btn locked" onclick="showPage('shouldnt', this)" data-en="Things we shouldn't do 🔒" data-fa="کارهایی که شاید نباید می‌کردیم 🔒">Things we shouldn't do 🔒</button>
+    </div>
+
+    <main>
+        <!-- Export Box (only in admin) -->
+        <div class="export-box" id="exportBox">
+            <button class="export-btn" onclick="exportData()">📋 کپی داده‌ها (برای ارسال به Grok)</button>
+            <p class="export-status" id="exportStatus">داده‌ها کپی شد! الان بفرستش.</p>
+        </div>
+
+        <section id="page-didForHer" class="page active">
+            <h2 class="page-title" data-en="Things I did for her" data-fa="کارهایی که براش کردم">Things I did for her</h2>
+            <div class="add-area" id="add-didForHer">
+                <input type="text" id="url-didForHer" placeholder="لینک (عکس، فیلم یا embed)">
+                <input type="text" id="title-didForHer" placeholder="عنوان (اختیاری)">
+                <button class="add-btn" onclick="addItem('didForHer')">افزودن</button>
+            </div>
+            <div class="grid" id="grid-didForHer"></div>
+        </section>
+
+        <section id="page-sheDidForMe" class="page">
+            <h2 class="page-title" data-en="Things she did for me" data-fa="کارهایی که برام کرد">Things she did for me</h2>
+            <div class="add-area" id="add-sheDidForMe">
+                <input type="text" id="url-sheDidForMe" placeholder="لینک (عکس، فیلم یا embed)">
+                <input type="text" id="title-sheDidForMe" placeholder="عنوان (اختیاری)">
+                <button class="add-btn" onclick="addItem('sheDidForMe')">افزودن</button>
+            </div>
+            <div class="grid" id="grid-sheDidForMe"></div>
+        </section>
+
+        <section id="page-together" class="page">
+            <h2 class="page-title" data-en="Things we do together" data-fa="کارهایی که با هم کردیم">Things we do together</h2>
+            <div class="add-area" id="add-together">
+                <input type="text" id="url-together" placeholder="لینک (عکس، فیلم یا embed)">
+                <input type="text" id="title-together" placeholder="عنوان (اختیاری)">
+                <button class="add-btn" onclick="addItem('together')">افزودن</button>
+            </div>
+            <div class="grid" id="grid-together"></div>
+        </section>
+
+        <section id="page-weLove" class="page">
+            <h2 class="page-title" data-en="Things we love" data-fa="چیزایی که دوسش داریم">Things we love</h2>
+            <div class="add-area" id="add-weLove">
+                <input type="text" id="url-weLove" placeholder="لینک (عکس، فیلم یا embed)">
+                <input type="text" id="title-weLove" placeholder="عنوان (اختیاری)">
+                <button class="add-btn" onclick="addItem('weLove')">افزودن</button>
+            </div>
+            <div class="grid" id="grid-weLove"></div>
+        </section>
+
+        <section id="page-weWill" class="page">
+            <h2 class="page-title" data-en="Things we will do" data-fa="کارهایی که قراره بکنیم">Things we will do</h2>
+            <div class="add-area" id="add-weWill">
+                <input type="text" id="url-weWill" placeholder="لینک (عکس، فیلم یا embed)">
+                <input type="text" id="title-weWill" placeholder="عنوان (اختیاری)">
+                <button class="add-btn" onclick="addItem('weWill')">افزودن</button>
+            </div>
+            <div class="grid" id="grid-weWill"></div>
+        </section>
+
+        <section id="page-shouldnt" class="page">
+            <h2 class="page-title" data-en="Things we shouldn't do 🔒" data-fa="کارهایی که شاید نباید می‌کردیم 🔒">Things we shouldn't do 🔒</h2>
+            
+            <div id="content-shouldnt" style="display: none;">
+                <div class="add-area" id="add-shouldnt">
+                    <input type="text" id="url-shouldnt" placeholder="لینک (عکس، فیلم یا embed)">
+                    <input type="text" id="title-shouldnt" placeholder="عنوان (اختیاری)">
+                    <button class="add-btn" onclick="addItem('shouldnt')">افزودن</button>
+                </div>
+                <div class="grid" id="grid-shouldnt"></div>
+            </div>
+
+            <div class="lock-screen" id="lock-shouldnt">
+                <h2 data-en="Enter Password" data-fa="رمز رو بزن">Enter Password</h2>
+                <input type="password" id="pass-shouldnt" class="lock-input" placeholder="Password">
+                <button class="lock-btn" onclick="checkPassword()" data-en="Unlock" data-fa="باز کن">Unlock</button>
+                <p class="lock-error" id="error-shouldnt" data-en="Wrong password!" data-fa="رمز اشتباهه!">Wrong password!</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ================== رمزها ==================
+        const ADMIN_PASS = "nanamel11";
+        const SECRET_PASS_SHOULDNT = "nononono";
+
+        let currentLang = 'en';
+        let isAdmin = false;
+
+        // ================== زبان ==================
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'fa' : 'en';
+            const langBtn = document.getElementById('langBtn');
+            const body = document.body;
+
+            if (currentLang === 'fa') {
+                body.setAttribute('dir', 'rtl');
+                langBtn.textContent = 'EN';
+                document.getElementById('siteLogo').textContent = 'نانامل';
+            } else {
+                body.setAttribute('dir', 'ltr');
+                langBtn.textContent = 'FA';
+                document.getElementById('siteLogo').textContent = 'Nanamel';
+            }
+
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + currentLang);
+            });
+
+            const passInput = document.getElementById('pass-shouldnt');
+            if (passInput) {
+                passInput.placeholder = currentLang === 'fa' ? 'رمز' : 'Password';
+            }
+
+            renderAll();
+        }
+
+        // ================== پنل ادمین ==================
+        function toggleAdmin() {
+            if (isAdmin) {
+                isAdmin = false;
+                document.body.classList.remove('admin-mode');
+                document.getElementById('adminBtn').classList.remove('active');
+                document.getElementById('adminBtn').textContent = 'Admin';
+                document.querySelectorAll('.add-area').forEach(el => el.classList.remove('show'));
+                document.getElementById('exportBox').classList.remove('show');
+                return;
+            }
+
+            const pass = prompt(currentLang === 'fa' ? 'رمز ادمین را وارد کنید:' : 'Enter admin password:');
+            if (pass === ADMIN_PASS) {
+                isAdmin = true;
+                document.body.classList.add('admin-mode');
+                document.getElementById('adminBtn').classList.add('active');
+                document.getElementById('adminBtn').textContent = 'Admin ✓';
+                document.querySelectorAll('.add-area').forEach(el => el.classList.add('show'));
+                document.getElementById('exportBox').classList.add('show');
+            } else if (pass !== null) {
+                alert(currentLang === 'fa' ? 'رمز اشتباه است!' : 'Wrong password!');
+            }
+        }
+
+        // ================== کپی داده‌ها ==================
+        function exportData() {
+            const data = localStorage.getItem('nanamel_gallery');
+            if (!data) {
+                alert(currentLang === 'fa' ? 'هیچ داده‌ای پیدا نشد!' : 'No data found!');
+                return;
+            }
+
+            // Try modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(data).then(() => {
+                    const status = document.getElementById('exportStatus');
+                    status.style.display = 'block';
+                    status.textContent = currentLang === 'fa' ? '✅ داده‌ها کپی شد! الان بفرستش.' : '✅ Data copied! Send it now.';
+                    setTimeout(() => { status.style.display = 'none'; }, 4000);
+                }).catch(() => {
+                    fallbackCopy(data);
+                });
+            } else {
+                fallbackCopy(data);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                const status = document.getElementById('exportStatus');
+                status.style.display = 'block';
+                status.textContent = currentLang === 'fa' ? '✅ داده‌ها کپی شد! الان بفرستش.' : '✅ Data copied! Send it now.';
+                setTimeout(() => { status.style.display = 'none'; }, 4000);
+            } catch (err) {
+                prompt(currentLang === 'fa' ? 'این متن رو کپی کن:' : 'Copy this text:', text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ================== نمایش صفحات ==================
+        function showPage(pageName, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('page-' + pageName).classList.add('active');
+            btn.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================== رمز بخش قفل‌شده ==================
+        function checkPassword() {
+            const input = document.getElementById('pass-shouldnt').value;
+            const lockScreen = document.getElementById('lock-shouldnt');
+            const content = document.getElementById('content-shouldnt');
+            const error = document.getElementById('error-shouldnt');
+
+            if (input === SECRET_PASS_SHOULDNT) {
+                lockScreen.style.display = 'none';
+                content.style.display = 'block';
+                error.style.display = 'none';
+            } else {
+                error.style.display = 'block';
+            }
+        }
+
+        // ================== ذخیره‌سازی ==================
+        function getData() {
+            const raw = localStorage.getItem('nanamel_gallery');
+            return raw ? JSON.parse(raw) : {
+                didForHer: [],
+                sheDidForMe: [],
+                together: [],
+                weLove: [],
+                weWill: [],
+                shouldnt: []
+            };
+        }
+
+        function saveData(data) {
+            localStorage.setItem('nanamel_gallery', JSON.stringify(data));
+        }
+
+        // ================== تشخیص نوع لینک ==================
+        function detectMediaType(url) {
+            const lower = url.toLowerCase();
+
+            const embedPatterns = [
+                /dood\.(stream|watch|to|so|ws|la|pm)/i,
+                /d0000d\.com/i,
+                /ds2play\.com/i,
+                /mixdrop\./i,
+                /mxdrop\./i,
+                /streamtape\./i,
+                /streamsb\./i,
+                /filemoon\./i,
+                /voe\.sx/i,
+                /lulustream\./i,
+                /\/e\//i,
+                /\/embed\//i
+            ];
+
+            for (const pattern of embedPatterns) {
+                if (pattern.test(lower)) {
+                    return 'embed';
+                }
+            }
+
+            if (lower.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i) || lower.includes('/api/file/')) {
+                return 'video';
+            }
+
+            if (lower.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || lower.includes('files.catbox.moe') || lower.includes('litter.catbox.moe') || lower.includes('i.ibb.co') || lower.includes('iili.io')) {
+                return 'image';
+            }
+
+            return 'image';
+        }
+
+        // ================== افزودن آیتم ==================
+        function addItem(category) {
+            const urlInput = document.getElementById('url-' + category);
+            const titleInput = document.getElementById('title-' + category);
+            const url = urlInput.value.trim();
+            const title = titleInput.value.trim();
+
+            if (!url) {
+                alert(currentLang === 'fa' ? 'لینک را وارد کنید' : 'Please enter a link');
+                return;
+            }
+
+            const data = getData();
+            const type = detectMediaType(url);
+
+            data[category].unshift({
+                id: Date.now().toString(),
+                url: url,
+                title: title,
+                type: type
+            });
+
+            saveData(data);
+            urlInput.value = '';
+            titleInput.value = '';
+            renderAll();
+        }
+
+        // ================== حذف آیتم ==================
+        function deleteItem(category, id) {
+            if (!confirm(currentLang === 'fa' ? 'مطمئنی می‌خوای پاکش کنی؟' : 'Delete this item?')) return;
+
+            const data = getData();
+            data[category] = data[category].filter(item => item.id !== id);
+            saveData(data);
+            renderAll();
+        }
+
+        // ================== ویرایش عنوان ==================
+        function updateTitle(category, id, newTitle) {
+            const data = getData();
+            const item = data[category].find(i => i.id === id);
+            if (item) {
+                item.title = newTitle.trim();
+                saveData(data);
+            }
+        }
+
+        // ================== ساخت تگ مدیا ==================
+        function createMediaTag(item) {
+            if (item.type === 'embed') {
+                return '<iframe src="' + item.url + '" allowfullscreen allow="autoplay; fullscreen" loading="lazy"></iframe>';
+            } else if (item.type === 'video') {
+                return '<video src="' + item.url + '" controls playsinline preload="metadata"></video>';
+            } else {
+                return '<img src="' + item.url + '" alt="' + (item.title || '') + '" loading="lazy" onerror="this.style.opacity=0.3">';
+            }
+        }
+
+        // ================== رندر ==================
+        function renderAll() {
+            const categories = ['didForHer', 'sheDidForMe', 'together', 'weLove', 'weWill', 'shouldnt'];
+            const data = getData();
+
+            categories.forEach(cat => {
+                const container = document.getElementById('grid-' + cat);
+                const items = data[cat] || [];
+
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="empty-state">' + (currentLang === 'fa' ? 'هنوز چیزی اضافه نشده' : 'Nothing here yet') + '</div>';
+                    return;
+                }
+
+                let html = '';
+                items.forEach(item => {
+                    html += '<div class="item">' +
+                        '<button class="delete-btn" onclick="deleteItem(\'' + cat + '\', \'' + item.id + '\')">×</button>' +
+                        '<div class="media-placeholder">' + createMediaTag(item) + '</div>' +
+                        '<div class="title-placeholder" contenteditable="' + isAdmin + '" onblur="updateTitle(\'' + cat + '\', \'' + item.id + '\', this.textContent)">' +
+                        (item.title || (currentLang === 'fa' ? 'بدون عنوان' : 'Untitled')) +
+                        '</div></div>';
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        // شروع
+        renderAll();
+    </script>
+</body>
+</html>
